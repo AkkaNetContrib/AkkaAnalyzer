@@ -42,6 +42,12 @@ namespace RoslynWorkspace
                 if (semanticClass.Name.Contains("Spec") || semanticClass.BaseType != null && semanticClass.BaseType.Name.Contains("Spec"))
                     continue;
 
+                if (semanticClass.Name.Contains("Test") || semanticClass.BaseType != null && semanticClass.BaseType.Name.Contains("Test"))
+                    continue;
+
+                if (semanticClass.ContainingNamespace.Name.Contains("Test") || semanticClass.ContainingNamespace.Name.Contains("Spec"))
+                    continue;
+
                 var references = await SymbolFinder.FindReferencesAsync(semanticClass, document.Project.Solution);
 
                 var referenceCount = (from reference in references
