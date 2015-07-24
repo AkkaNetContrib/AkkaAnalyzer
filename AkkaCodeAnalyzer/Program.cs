@@ -17,7 +17,7 @@ namespace RoslynWorkspace
 
         private static void Main(string[] args)
         {
-            const string solutionPath = @"../../../../../akka.sln";
+            const string solutionPath = @"../../../../akka.net/src/akka.sln";
             ProcessSolution(solutionPath)
                 .ContinueWith(t =>
                 {
