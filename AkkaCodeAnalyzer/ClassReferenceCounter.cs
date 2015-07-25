@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.FindSymbols;
+using System.IO;
 
 namespace RoslynWorkspace
 {
@@ -23,8 +24,7 @@ namespace RoslynWorkspace
             var classes = root
                 .DescendantNodes(node => true)
                 .OfType<ClassDeclarationSyntax>()
-                .ToList();
-
+                .ToList();            
 
             foreach (var @class in classes)
             {
@@ -49,13 +49,50 @@ namespace RoslynWorkspace
                     continue;
 
                 var references = await SymbolFinder.FindReferencesAsync(semanticClass, document.Project.Solution);
-
+                
                 var referenceCount = (from reference in references
                                       from locaton in reference.Locations
                                       select locaton).Count();
 
                 if (referenceCount == 0)
                 {
+                    var fullClassName = semanticClass.ContainingNamespace.ToDisplayString() + "." + semanticClass.Name;
+
+                    var configs = (from project in document.Project.Solution.Projects
+                                   from doc in project.Documents
+                                   where doc.FilePath != document.FilePath
+                                   select doc).ToList();
+
+                    bool usedInConfigs = false;
+                    foreach(var other in configs)
+                    {
+                        if (other.GetTextAsync().Result.ToString().Contains(fullClassName))
+                        {
+                            usedInConfigs = true;
+                            break;
+                        }
+                    }
+
+                    foreach (string file in Directory.EnumerateFiles(Path.GetDirectoryName(document.Project.Solution.FilePath), "*.conf", SearchOption.AllDirectories))
+                    {
+                        var text = File.ReadAllText(file);
+                        if (text.Contains(fullClassName))
+                        {
+                            usedInConfigs = true;
+                            break;
+                        }
+                    }
+
+                        if (usedInConfigs)
+                    {
+                        //this type is used in a config.
+                        //TODO: the current code only checks if the full class name is present in another file.
+                        //it does not take into account if the occurance is a comment or a string
+                        continue;
+                    }
+
+
+
                     const string comment = "/*TODO: this class is not used*/";
                     var newTrivia = SyntaxFactory.ParseLeadingTrivia(comment);
                     var newClass = @class.WithLeadingTrivia(@class.GetLeadingTrivia().Union(newTrivia));
