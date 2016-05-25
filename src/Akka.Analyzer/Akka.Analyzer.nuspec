@@ -1,0 +1,28 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>@project@</id>
+    <title>@project@@title@</title>
+    <version>@build.number@</version>
+    <authors>@authors@</authors>
+    <owners>@authors@</owners>
+     <description>Used to help support Akka.NET users and developers with common Akka-specific code issues</description>
+    <licenseUrl>https://github.com/akkadotnet/AkkaAnalyzer/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/akkadotnet/AkkaAnalyzer</projectUrl>
+    <iconUrl>http://getakka.net/images/AkkaNetLogo.Normal.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes>@releaseNotes@</releaseNotes>
+    <copyright>@copyright@</copyright>
+    <tags>@tags@</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System" targetFramework="" />
+    </frameworkAssemblies>
+    @dependencies@
+    @references@
+  </metadata>
+  <!-- The convention for analyzers is to put language agnostic dlls in analyzers\portable50 and language specific analyzers in either analyzers\portable50\cs or analyzers\portable50\vb -->
+  <files>
+    <file src="*.dll" target="analyzers\dotnet\cs" exclude="**\Microsoft.CodeAnalysis.*;**\System.Collections.Immutable.*;**\System.Reflection.Metadata.*;**\System.Composition.*" />
+    <file src="tools\*.ps1" target="tools\" />
+  </files>
+</package>
